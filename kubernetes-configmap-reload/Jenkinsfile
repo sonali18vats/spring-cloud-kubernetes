@@ -55,16 +55,14 @@ pipeline {
     stage('Ansible Setup') {
       when { expression { params.action == 'create' } }
       steps {
-        sh 'ansible-playbook /var/lib/jenkins/workspace/Jenkins Pipeline/kubernetes-configmap-reload/server_setup.yml'
-
+        sh "ansible-playbook \"${WORKSPACE}/${params.AppName}/server_setup.yml\""
       }
     }
 
     stage('Create Deployment') {
       when { expression { params.action == 'create' } }
       steps {
-        sh "echo ${WORKSPACE}"
-        sh "kubectl create -f ${WORKSPACE}/kubernetes-configmap-reload/kubernetes-configmap.yml"
+        sh "kubectl create -f \"${WORKSPACE}/${params.AppName}/kubernetes-configmap.yml\""
       }
     }
 
@@ -79,11 +77,10 @@ pipeline {
       when { expression { params.action == 'rollback' } }
       steps {
         sh """
-          kubectl delete deploy ${params.AppName}
-          kubectl delete svc ${params.AppName}
+          kubectl delete deploy ${params.AppName} || true
+          kubectl delete svc ${params.AppName} || true
         """
       }
     }
-
   }
 }
