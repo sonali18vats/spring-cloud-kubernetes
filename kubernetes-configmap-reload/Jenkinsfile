@@ -12,7 +12,7 @@ pipeline {
   }
 
   tools {
-    maven 'maven3' // Make sure this name matches your Global Tool Configuration
+    maven 'maven3' // Ensure this matches your Jenkins global Maven configuration
   }
 
   stages {
@@ -48,7 +48,7 @@ pipeline {
     stage('Docker Cleanup') {
       when { expression { params.action == 'create' } }
       steps {
-        dockerCleanup("${params.ImageName}", "${params.docker_repo}")
+        dockerCleanup("${params.ImageName}", "${params.docker_repo}", "${params.ImageTag}")
       }
     }
 
