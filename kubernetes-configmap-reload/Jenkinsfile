@@ -8,7 +8,7 @@ pipeline {
     string(name: 'ImageName', description: "Name of the docker build", defaultValue: "kubernetes-configmap-reload")
     string(name: 'ImageTag', description: "Docker image tag", defaultValue: "v1")
     string(name: 'AppName', description: "Name of the Application", defaultValue: "kubernetes-configmap-reload")
-    string(name: 'docker_repo', description: "DockerHub username/repo", defaultValue: "praveensingam1994")
+    string(name: 'docker_repo', description: "DockerHub username/repo", defaultValue: "sonali1897/kubernetes-configmap-reload")
   }
 
   tools {
