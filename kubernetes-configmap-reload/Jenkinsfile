@@ -55,7 +55,8 @@ pipeline {
     stage('Ansible Setup') {
       when { expression { params.action == 'create' } }
       steps {
-        sh "ansible-playbook ${WORKSPACE}/kubernetes-configmap-reload/server_setup.yml"
+        sh 'ansible-playbook /var/lib/jenkins/workspace/Jenkins Pipeline/kubernetes-configmap-reload/server_setup.yml'
+
       }
     }
 
