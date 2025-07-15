@@ -5,7 +5,7 @@ pipeline {
 
   environment {
     AWS_REGION = 'us-east-1'        // e.g., us-west-2
-    EKS_CLUSTER = 'first-eks-cluster' // e.g., my-eks-cluster
+    EKS_CLUSTER = 'first-eks-cluster' 
   }
   
   parameters {
