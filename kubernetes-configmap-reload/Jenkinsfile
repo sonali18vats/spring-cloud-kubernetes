@@ -3,6 +3,11 @@
 pipeline {
   agent any
 
+  environment {
+    AWS_REGION = 'us-east-1'        // e.g., us-west-2
+    EKS_CLUSTER = 'first-eks-cluster-worker-nodes-Node' // e.g., my-eks-cluster
+  }
+  
   parameters {
     choice(name: 'action', choices: 'create\nrollback', description: 'Create/rollback of the deployment')
     string(name: 'ImageName', description: "Name of the docker build", defaultValue: "kubernetes-configmap-reload")
@@ -62,24 +67,36 @@ pipeline {
     stage('Create Deployment') {
       when { expression { params.action == 'create' } }
       steps {
-        sh "kubectl create -f \"${WORKSPACE}/${params.AppName}/kubernetes-configmap.yml\""
+        withCredentials([
+          [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_credential']
+        ]) {
+          sh """
+            aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+            kubectl apply -f \"${WORKSPACE}/${params.AppName}/kubernetes-configmap.yml\"
+          """
+        }
       }
     }
 
     stage('Wait for Pods') {
       when { expression { params.action == 'create' } }
       steps {
-        sh 'sleep 300'
+        sh 'sleep 60' // You can adjust time as needed
       }
     }
 
     stage('Rollback Deployment') {
       when { expression { params.action == 'rollback' } }
       steps {
-        sh """
-          kubectl delete deploy ${params.AppName} || true
-          kubectl delete svc ${params.AppName} || true
-        """
+        withCredentials([
+          [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_credential']
+        ]) {
+          sh """
+            aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER
+            kubectl delete deploy ${params.AppName} || true
+            kubectl delete svc ${params.AppName} || true
+          """
+        }
       }
     }
   }
